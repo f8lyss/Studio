@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Music</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Orbitron', sans-serif;
+      background: url('https://f8lyss.neocities.org/Jellfish.jpeg') no-repeat center/cover fixed;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    nav {
+      position: absolute;
+      top: 0; width: 100%;
+      display: flex;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 10px 0;
+      z-index: 10;
+    }
+    nav a {
+      margin: 0 20px;
+      color: white;
+      text-decoration: none;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
+    nav a:hover { color: #ff4081; }
+
+    .bubble {
+      position: absolute;
+      bottom: -50px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      animation: floatUp 8s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(0) rotate(0); opacity: 0; }
+      10% { opacity: 1; }
+      100% { transform: translateY(-100vh) rotate(var(--tilt)); opacity: 0; }
+    }
+
+    .player-wrapper { margin-top: 60px; text-align: center; }
+    .player-container {
+      width: 450px;
+      padding: 24px;
+      border-radius: 26px;
+      background: rgba(211, 211, 211, 0.35);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 8px 20px rgba(255,255,255,0.1);
+    }
+    .title-in-box { font-size: 25px; font-weight: bold; margin-bottom: 6px; }
+
+    .song-list {
+      margin-top: 4px;
+      max-height: 95px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 0px;
+      padding: 7px;
+      width: 100%;
+    }
+    .song-item {
+      padding: 7px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      background: #f9f9f9;
+      border-bottom: 1px solid #eee;
+      border-radius: 0px;
+      transition: 0.3s;
+    }
+    .song-item:hover {
+      background: #e0e0e0;
+      font-size: 14px;
+      font-weight: bold;
+      color: #ff4081;
+    }
+    .song-item.active-song {
+      background: lightpink;
+      color: black;
+    }
+
+    .play-button {
+      margin-top: 10px;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: lightpink;
+      color: white;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .play-button:hover { transform: scale(1.1); }
+    .play-button:active { transform: scale(0.9); }
+
+    .scrolling-track-title {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 10px 0;
+      font-size: 12px;
+      text-align: center;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+    }
+    .scrolling-track-title span {
+      display: inline-block;
+      padding: 0 20px;
+      animation: bounce-scroll 10s linear infinite alternate;
+    }
+    @keyframes bounce-scroll {
+      0% { transform: translateX(20%); }
+      100% { transform: translateX(-20%); }
+    }
+
+    .progress-container {
+      margin-top: 15px;
+      width: 80%;
+      height:15px;
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 50px;
+      position: relative;
+      cursor: pointer; /* Make the progress bar clickable */
+    }
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      background: lightpink;
+      border-radius: 50px;
+      position: absolute;
+    }
+    .progress-time {
+      pointer-events: none;
+      position: absolute;
+      top: 0px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: BLACK;
+      font-size: 12px;
+      font-weight: bold;
+      z-index: 1;
+    }
+
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">My Music</a>
+    <a href="#">Ascend the Crest</a>
+    <a href="#">Social</a>
+  </nav>
+
+  <div class="player-wrapper">
+    <div class="player-container">
+      <div class="title-in-box">Music</div>
+      <div class="song-list" id="song-list">
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/p1795s0yke9dpglot89ln/Sinking_Deeper.mp3?rlkey=q13mqlzcxqeh11lvfg6o9aori&dl=1">Sinking Deeper</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample1.mp3?dl=1">Pink Moss</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample2.mp3?dl=1">Hollow Dreams</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample3.mp3?dl=1">Neon Fade</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample4.mp3?dl=1">Static Pulse</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample5.mp3?dl=1">Wires & Whispers</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample6.mp3?dl=1">Crystalline</div>
+        <div class="song-item" data-url="https://www.dropbox.com/scl/fi/abc123456/sample7.mp3?dl=1">Lost Frequencies</div>
+      </div>
+      <div class="play-button" id="play-button">▶</div>
+      
+      <!-- Track Progress Bar -->
+      <div class="progress-container" id="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+        <div class="progress-time" id="progress-time">0:00</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scrolling-track-title">
+    <span id="current-song-title">Loading...</span>
+  </div>
+
+  <script>
+    const audioPlayer = new Audio();
+    const songTitle = document.getElementById("current-song-title");
+    const playButton = document.getElementById("play-button");
+    const songItems = document.querySelectorAll(".song-item");
+    const progressBar = document.getElementById("progress-bar");
+    const progressTime = document.getElementById("progress-time");
+    const progressContainer = document.getElementById("progress-container");
+    let currentIndex = 0;
+
+    function loadAndPlay(index) {
+      if (index < 0 || index >= songItems.length) return;
+      const item = songItems[index];
+      audioPlayer.src = item.dataset.url;
+      audioPlayer.play().catch(() => {});
+      playButton.textContent = "❚❚"; // Set to pause icon when playing
+      songTitle.textContent = item.textContent;
+      songItems.forEach(el => el.classList.remove("active-song"));
+      item.classList.add("active-song");
+      currentIndex = index;
+    }
+
+    songItems.forEach((item, index) =>
+      item.addEventListener("click", () => loadAndPlay(index))
+    );
+
+    playButton.addEventListener("click", () => {
+      // If no song is loaded yet, load and play the first song
+      if (!audioPlayer.src) {
+        loadAndPlay(0);
+      } else {
+        // Toggle play/pause
+        if (audioPlayer.paused) {
+          audioPlayer.play().catch(() => {});
+          playButton.textContent = "❚❚";
+        } else {
+          audioPlayer.pause();
+          playButton.textContent = "▶";
+        }
+      }
+    });
+
+    // Update progress bar and time
+    audioPlayer.addEventListener('timeupdate', () => {
+      const currentTime = audioPlayer.currentTime;
+      const duration = audioPlayer.duration;
+      const progress = (currentTime / duration) * 100;
+      progressBar.style.width = `${progress}%`;
+
+      // Format time as mm:ss
+      const minutes = Math.floor(currentTime / 60);
+      const seconds = Math.floor(currentTime % 60);
+      progressTime.textContent = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+    });
+
+    // Make the progress bar clickable
+    progressContainer.addEventListener('click', (e) => {
+      const clickPosition = (e.offsetX / progressContainer.offsetWidth) * audioPlayer.duration;
+      audioPlayer.currentTime = clickPosition;
+    });
+
+    function createBubbles() {
+      for (let i = 0; i < 30; i++) {
+        const b = document.createElement("div");
+        b.className = "bubble";
+        const size = Math.random() * 50 + 20;
+        Object.assign(b.style, {
+          width: `${size}px`,
+          height: `${size}px`,
+          left: `${Math.random() * 100}%`,
+          animationDelay: `${Math.random() * 4}s`
+        });
+        b.style.setProperty("--tilt", `${Math.random() * 180}deg`);
+        document.body.appendChild(b);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      createBubbles();
+      loadAndPlay(currentIndex);
+    });
+  </script>
+</body>
+</html>
